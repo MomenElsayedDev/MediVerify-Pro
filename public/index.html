@@ -166,6 +166,14 @@
           >
             <i class="fas fa-search"></i> Start Verification
           </button>
+          <!-- AI Medicine Advisor Button -->
+<button
+  onclick="aiSuggestMed()"
+  class="w-full mt-4 text-white py-5 rounded-2xl font-black text-xl shadow-xl flex justify-center items-center gap-3"
+  style="background: linear-gradient(135deg, #7c3aed, #ec4899);"
+>
+  <i class="fas fa-robot"></i> AI Medicine Advisor
+</button>
         </div>
       </div>
 
@@ -185,6 +193,25 @@
                 class="fas fa-pills text-4xl text-blue-100 dark:text-slate-700"
               ></i>
             </div>
+            <!-- AI Health Advisor Card -->
+<div class="glass p-6">
+  <h3 class="text-xl font-black mb-4 flex items-center gap-2 text-slate-800 dark:text-white">
+    <i class="fas fa-robot text-purple-500 pulse-icon"></i>
+    AI Health Advisor
+  </h3>
+  <p class="text-slate-500 text-sm mb-4">Click to generate a random medicine with AI health tips</p>
+  <button
+    onclick="aiSuggestMed()"
+    class="w-full text-white py-4 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2"
+    style="background: linear-gradient(135deg, #7c3aed, #ec4899);"
+  >
+    <i class="fas fa-magic-wand-sparkles"></i> Generate AI Advice
+  </button>
+  <!-- AI Result Box (hidden by default, shown after API response) -->
+  <div id="aiResult" class="hidden mt-4 p-4 rounded-xl" style="background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2);">
+    <div id="aiResultContent" class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed"></div>
+  </div>
+</div>
 
             <div class="glass p-8">
               <h3

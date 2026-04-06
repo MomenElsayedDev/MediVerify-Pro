@@ -1,3 +1,7 @@
+// node-fetch is required for Node.js versions below 18
+// Node 18+ has fetch built-in, so this line is safe to keep either way
+const fetch = (...args) => import("node-fetch").then(({ default: f }) => f(...args));
+
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");

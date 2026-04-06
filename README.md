@@ -1,4 +1,3 @@
-
 # 🛡️ MediVerify Pro
 ### **Advanced Medicine Authenticity & Inventory Management System**
 
@@ -10,7 +9,7 @@
 
 | Dark Mode Interface | Light Mode Interface |
 | :---: | :---: |
-| ![Dark Mode](/DarkMode.png) | ![Light Mode](/LightMode.png) |
+| ![Dark Mode](LightMode.jpg) | ![Light Mode](DarkMode.jpg) |
 | *Premium Glassmorphism Design* | *Clean & Professional UI* |
 
 ---
@@ -28,6 +27,13 @@
 - **Double-Safety Logic:** The system checks if the serial exists AND validates the **Expiry Date** to warn against outdated products.
 - **Dynamic Alerts:** High-end interactive notifications using **SweetAlert2** (Success for Authentic, Error for Fake, Warning for Expired).
 
+### 🤖 AI Health Advisor *(New)*
+- **Smart Suggestions:** One-click generation of random medicine entries via the AI Health Advisor button.
+- **Auto Database Entry:** Generated medicines are instantly saved to the database with a unique serial number and expiry date.
+- **Dashboard Integration:** The medicine table and stats counter refresh automatically after each AI suggestion.
+- **Dual Entry Points:** The AI advisor button is available on both the Verify page and the Admin Dashboard.
+- **Secure Architecture:** Anthropic API key is stored server-side in `.env` and never exposed to the frontend.
+
 ### 🎨 Visual Experience
 - **Glassmorphism UI:** Modern translucent panels with backdrop blur effects.
 - **Theme Persistence:** Automated Dark/Light mode based on user preference, saved in `localStorage`.
@@ -42,7 +48,8 @@
 | **Backend** | Node.js, Express.js |
 | **Database** | MongoDB (Mongoose ODM) |
 | **Security** | JWT, Bcryptjs, CORS |
-| **Utilities** | Nanoid (ID Generation), Dotenv |
+| **AI Integration** | Anthropic Claude API (claude-sonnet-4-20250514) |
+| **Utilities** | Nanoid (ID Generation), Dotenv, Crypto |
 
 ---
 
@@ -62,7 +69,8 @@
 │   └── style.css            # Custom CSS & Glassmorphism styling
 ├── routes/
 │   ├── authRoutes.js        # Authentication API endpoints
-│   └── medicineRoutes.js    # Medicine CRUD & Verification endpoints
+│   ├── medicineRoutes.js    # Medicine CRUD & Verification endpoints
+│   └── aiRoutes.js          # AI Health Advisor endpoint (New)
 ├── utils/
 │   └── errorResponse.js     # Custom Error Handling class
 ├── .env                     # Environment variables (Private)
@@ -70,40 +78,86 @@
 ├── app.js                   # Server entry point & Middleware setup
 ├── package.json             # Project dependencies & Scripts
 ├── package-lock.json        # Locked dependency versions
-└── README.md                
+└── README.md                # Project documentation
 ```
-# Project documentation
 
 ---
 
 ## ⚙️ Installation & Deployment
+
 ### Clone the repository:
-git clone [https://github.com/Username/MediVerify-Pro.git](https://github.com/Username/MediVerify-Pro.git)
-
+```bash
+git clone https://github.com/MomenElsayedDev/MediVerify-Pro.git
 cd MediVerify-Pro
----
-## ⚙️ Install dependencies:
+```
+
+### Install dependencies:
+```bash
 npm install
+```
 
----
-
-## ⚙️ Environment Setup: 
-## Create a .env file in the root directory:
-PORT=3000
+### Environment Setup:
+Create a `.env` file in the root directory:
+```dotenv
+PORT=3001
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_super_secret_key
+ANTHROPIC_API_KEY=your_anthropic_api_key
+```
 
-# 🚀 Launch the system:
-Development: npm run dev (via Nodemon)
-Production: npm start
+### Launch the system:
+```bash
+# Development mode (with Nodemon)
+npm run dev
 
-# 🔒 Reliability & Performance
+# Production mode
+npm start
+```
 
-## 🟠 CORS Enabled: Cross-Origin Resource Sharing configured for secure frontend-backend communication.
+---
 
-## 🟢 Centralized Error Handling: Standardized API responses for every possible error scenario using a custom ErrorResponse class.
+## 🔌 API Endpoints
 
-## 🟠 Efficient ID Generation: Using Nanoid for collision-resistant and URL-friendly serial numbers.
+### Auth Routes — `/api/auth`
 
-# 👨‍💻 Developed By:
-## Momen Elsayed
+| Method | Endpoint    | Description          | Auth |
+|--------|-------------|----------------------|------|
+| POST   | `/register` | Create admin account | ❌   |
+| POST   | `/login`    | Login and get token  | ❌   |
+
+### Medicine Routes — `/api/medicines`
+
+| Method | Endpoint          | Description             | Auth |
+|--------|-------------------|-------------------------|------|
+| GET    | `/all`            | Get all medicines       | ❌   |
+| GET    | `/verify/:serial` | Verify by serial number | ❌   |
+| GET    | `/:id`            | Get medicine by ID      | ❌   |
+| POST   | `/add`            | Add new medicine        | ✅   |
+| PUT    | `/update/:id`     | Update medicine details | ✅   |
+| DELETE | `/delete/:id`     | Delete a medicine       | ✅   |
+
+### AI Routes — `/api/ai` *(New)*
+
+| Method | Endpoint   | Description                                | Auth |
+|--------|------------|--------------------------------------------|------|
+| POST   | `/suggest` | Generate & save a random AI medicine entry | ❌   |
+
+---
+
+## 🔒 Reliability & Performance
+
+🟠 **CORS Enabled:** Cross-Origin Resource Sharing configured for secure frontend-backend communication.
+
+🟢 **Centralized Error Handling:** Standardized API responses for every possible error scenario using a custom `ErrorResponse` class.
+
+🟠 **Efficient ID Generation:** Using **Crypto** for collision-resistant serial numbers in the format `MV-XXXXXX`.
+
+🟢 **Secure API Keys:** The Anthropic API key is stored server-side in `.env` and never exposed to the frontend.
+
+---
+
+## 👨‍💻 Developed By
+
+**Momen Elsayed**
+- GitHub: [@MomenElsayedDev](https://github.com/MomenElsayedDev)
+- LinkedIn: [momen-elsayed-dev](https://www.linkedin.com/in/momen-elsayed-dev/)

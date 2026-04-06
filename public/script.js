@@ -414,3 +414,50 @@ document.addEventListener('input', function (e) {
     }
 });
 
+async function aiSuggestMed() {
+
+  // Show loading spinner
+  Swal.fire({
+    title: "AI is generating...",
+    html: '<i class="fas fa-robot fa-spin text-3xl text-purple-500"></i>',
+    allowOutsideClick: false,
+    showConfirmButton: false,
+  });
+
+  try {
+    // Call backend to generate and save a random medicine
+    const response = await fetch("/api/ai/suggest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const data = await response.json();
+
+    if (!data.success) {
+      return Swal.fire("Error", data.message, "error");
+    }
+
+    const aiText = data.advice || "Medicine added successfully.";
+
+    Swal.close();
+
+    // If on dashboard, refresh the medicine table and stats
+    const tableBody = document.getElementById("medsTableBody");
+    if (tableBody) {
+      loadMedicines(); // Refresh the table
+      loadStats();     // Refresh the counter
+    }
+
+    // Show success popup
+    Swal.fire({
+      title: "🤖 AI Suggestion Added!",
+      html: `<div class="text-left text-sm leading-relaxed p-2">${aiText.replace(/\n/g, "<br>")}</div>`,
+      confirmButtonText: "Great!",
+      confirmButtonColor: "#7c3aed",
+      customClass: { popup: "rounded-3xl" }
+    });
+
+  } catch (err) {
+    Swal.fire("Error", "Failed to connect to AI. Please try again.", "error");
+  }
+}

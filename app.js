@@ -1,12 +1,11 @@
+const dotenv = require("dotenv");
+dotenv.config(); // Must be first before requiring routes
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
-const dotenv = require("dotenv");
 
-
-
-dotenv.config();
 const app = express();
 
 app.use(cors());
@@ -15,6 +14,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/medicines", require("./routes/medicineRoutes"));
+app.use("/api/ai", require("./routes/aiRoutes"));
 
 mongoose
   .connect(process.env.MONGODB_URI)
