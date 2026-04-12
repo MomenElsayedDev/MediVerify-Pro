@@ -2,59 +2,92 @@ const express = require("express");
 const router = express.Router();
 const Medicine = require("../models/Medicine");
 const crypto = require("crypto");
+const Groq = require("groq-sdk");
 
-// ==========================================
-// [POST] /api/ai/suggest
-// Generates a random medicine with AI health tips
-// and saves it directly to the database
-// ==========================================
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
+
+// 🧠 آخر دواء اتعرض
+let lastMedicine = null;
+
+// 🔢 Serial
+function generateSerial() {
+  return "MV-" + crypto.randomBytes(4).toString("hex").toUpperCase();
+}
+
+// 📅 Expiry
+function generateExpiry() {
+  const date = new Date();
+  const months = Math.floor(Math.random() * 30) + 6;
+  date.setMonth(date.getMonth() + months);
+  return date;
+}
+
+// 🧠 AI with anti-repeat logic
+async function getUniqueMedicine() {
+  const response = await groq.chat.completions.create({
+    model: "llama-3.1-8b-instant",
+    temperature: 1.2,
+    messages: [
+      {
+        role: "system",
+        content: `
+Return ONLY ONE medicine name.
+
+DO NOT repeat the previous medicine: ${lastMedicine || "none"}.
+
+Choose from:
+Paracetamol, Ibuprofen, Amoxicillin, Omeprazole,
+Metformin, Aspirin, Cetirizine, Azithromycin, Vitamin D3
+        `,
+      },
+      {
+        role: "user",
+        content: "Give a different medicine than last time.",
+      },
+    ],
+  });
+
+  const med = response.choices[0].message.content.trim();
+
+  lastMedicine = med; // 🧠 update memory
+
+  return med;
+}
+
+// 🚀 ROUTE
 router.post("/suggest", async (req, res) => {
-
-  // List of medicines to pick from randomly
-  const medicines = [
-    { name: "Paracetamol", brand: "Panadol" },
-    { name: "Ibuprofen", brand: "Brufen" },
-    { name: "Amoxicillin", brand: "Amoxil" },
-    { name: "Omeprazole", brand: "Losec" },
-    { name: "Metformin", brand: "Glucophage" },
-    { name: "Atorvastatin", brand: "Lipitor" },
-    { name: "Aspirin", brand: "Aspocid" },
-    { name: "Cetirizine", brand: "Zyrtec" },
-    { name: "Azithromycin", brand: "Zithromax" },
-    { name: "Vitamin D3", brand: "Vidrop" }
-  ];
-
-  // Pick a random medicine
-  const randomMed = medicines[Math.floor(Math.random() * medicines.length)];
-
-  // Generate a random expiry date between 1 and 3 years from now
-  const expiryDate = new Date();
-  expiryDate.setFullYear(expiryDate.getFullYear() + Math.floor(Math.random() * 3) + 1);
-
-  // Generate unique serial number
-  const serialNumber = "MV-" + crypto.randomBytes(3).toString("hex").toUpperCase();
-
   try {
-    // Save the medicine to the database
-    const newMed = await Medicine.create({
-      name: randomMed.name,
-      brand: randomMed.brand,
-      serialNumber,
-      expiryDate,
-      description: "AI Generated suggestion",
-    });
+    const medicineName = await getUniqueMedicine();
 
-    console.log("AI medicine saved:", newMed.name, serialNumber);
+    const serial = generateSerial();
+    const expiry = generateExpiry();
+
+    const newMed = await Medicine.create({
+      name: medicineName,
+      brand: "Generated",
+      serialNumber: serial,
+      expiryDate: expiry,
+      description: "AI generated medicine",
+    });
 
     res.json({
       success: true,
-      advice: `✅ "${randomMed.name}" has been added to the medicine logs.\n💊 Serial: ${serialNumber}\n📅 Expires: ${expiryDate.toLocaleDateString("en-GB")}`,
-      medicine: newMed
+      medicine: newMed,
+      info: {
+        name: medicineName,
+        serial,
+        expiry: expiry.toLocaleDateString("en-GB"),
+      },
     });
-
   } catch (err) {
-    console.error("AI Route Error:", err.message);
-    res.status(500).json({ success: false, message: "Failed to save medicine: " + err.message });
+    console.error("🔥 AI Error:", err.message);
+
+    res.status(500).json({
+      success: false,
+      message: "AI generation failed",
+    });
   }
 });
 
